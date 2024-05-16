@@ -1,5 +1,8 @@
 package com.pluralsight;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class UserInterface {
@@ -19,6 +22,8 @@ public class UserInterface {
             System.out.println(" Enter 7 to  Display All Vehicles");
             System.out.println(" Enter 8 to  Add a Vehicle");
             System.out.println(" Enter 9 to  Remove a Vehicle");
+            System.out.println(" Enter 10 to  buy a Vehicle");
+            System.out.println(" Enter 11 to  lease a Vehicle");
             System.out.println(" Enter 0 to  Exit");
 
             try { // Enforce input type
@@ -53,6 +58,12 @@ public class UserInterface {
                     case 9:
                         processRemoveVehicleRequest();
                         break;
+                    case 10:
+                        sellVehicle();
+                        break;
+                    case 11:
+                        leaseVehicle();
+                        break;
                     case 0:
                         System.exit(0);
                     default: // Enforce input range
@@ -64,6 +75,9 @@ public class UserInterface {
             }
         }
     }
+
+
+
 
     public void processGetByPriceRequest() {
         // ask for price range
@@ -193,6 +207,173 @@ public class UserInterface {
     }
     private void init() {
         this.dealership = DealershipFileManager.getDealership();
+    }
+
+
+    public void sellVehicle() {
+        LocalDate ldt = LocalDate.now();
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String formattedDate = ldt.format(dtf);
+
+
+        // Initialize the variables.
+        ContractDataManager contractDataManager = new ContractDataManager();
+
+
+        while (true) {
+            // Ask the user to enter the VIN.
+            System.out.print("Enter VIN of the vehicle to sell: ");
+            int vin;
+            try {
+                vin = scanner.nextInt();
+                scanner.nextLine();
+                // Print error if invalid input.
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter a valid VIN.");
+                scanner.nextLine();
+                continue;
+            }
+
+            // Search for the vehicle.
+            Vehicle SoldVehicle = null;
+            for (Vehicle vehicle : dealership.getAllVehicles()) {
+                if (vehicle.getVin() == vin) {
+                    SoldVehicle = vehicle;
+                    break;
+                }
+            }
+
+            // If no results, print message and ask the user to try again.
+            if (SoldVehicle == null) {
+                System.out.println("Vehicle with VIN " + vin + " not found.");
+                continue;
+            }
+
+            // Ask the user for the customer name.
+            System.out.print("Enter customer name: ");
+            String customerName = scanner.nextLine();
+
+            // Ask the user for the customer email.
+            System.out.print("Enter customer email: ");
+            String customerEmail = scanner.nextLine();
+
+            // Ask the user for the total price.
+            System.out.print("Enter total price: ");
+            double totalPrice;
+            try {
+                totalPrice = scanner.nextDouble();
+                scanner.nextLine();
+                // Print error if invalid input.
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter a valid price.");
+                scanner.nextLine();
+                continue;
+            }
+
+            // Calculate the sales tax.
+            double salesTax = totalPrice * SalesContract.salesTaxRate;
+
+            // Calculate the processing fee.
+            double processingFee = (totalPrice < 10000) ? SalesContract.Under10Kfee : SalesContract.Over10Kfee;
+
+            // Call offerAddOns method.
+
+
+            // Create the SalesContract object.
+            SalesContract salesContract = new SalesContract(formattedDate, customerName, customerEmail, SoldVehicle, totalPrice, salesTax, processingFee);
+
+            // Add the selected AddOns.
+
+
+            // Save the contract.
+            contractDataManager.saveContract(salesContract);
+
+            // Remove vehicle.
+            dealership.removeVehicle(SoldVehicle);
+
+            // Print success message.
+            System.out.println("\nVehicle successfully sold!");
+            break;
+        }
+
+
+    }
+    private void leaseVehicle() {
+        LocalDate ldt = LocalDate.now();
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String formattedDate = ldt.format(dtf);
+        // Initialize the variable.
+        ContractDataManager contractDataManager = new ContractDataManager();
+
+        while (true) {
+            // Ask the user to enter the VIN.
+            System.out.print("Enter VIN of the vehicle to lease: ");
+            int vin;
+            try {
+                vin = scanner.nextInt();
+                scanner.nextLine();
+                // Print error if invalid input.
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter a valid VIN.");
+                scanner.nextLine();
+                continue;
+            }
+
+            // Search for the vehicle.
+            Vehicle LeasedVehicle = null;
+            for (Vehicle vehicle : dealership.getAllVehicles()) {
+                if (vehicle.getVin() == vin) {
+                    LeasedVehicle = vehicle;
+                    break;
+                }
+            }
+
+            // If no results, print message and ask the user to try again.
+            if (LeasedVehicle == null) {
+                System.out.println("Vehicle with VIN " + vin + " not found.");
+                continue;
+            }
+
+            // Ask the user for the customer name.
+            System.out.print("Enter customer name: ");
+            String customerName = scanner.nextLine();
+
+            // Ask the user for the customer email.
+            System.out.print("Enter customer email: ");
+            String customerEmail = scanner.nextLine();
+
+            // Ask the user for the total price.
+            System.out.print("Enter total price: ");
+            double totalPrice;
+            try {
+                totalPrice = scanner.nextDouble();
+                scanner.nextLine();
+                // Print error if invalid input.
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter a valid price.");
+                scanner.nextLine();
+                continue;
+            }
+
+            // Calculate the lease fee.
+            double leaseFee = totalPrice * LeaseContract.leaseFeeRate;
+
+            // Calculate the monthly payment.
+            double monthlyPayment = totalPrice * LeaseContract.interestRate / (1 - Math.pow(1 + LeaseContract.interestRate, -LeaseContract.loanTerm));
+
+            // Create the LeaseContract object.
+            LeaseContract leaseContract = new LeaseContract(formattedDate, customerName, customerEmail, LeasedVehicle, leaseFee, monthlyPayment);
+
+            // Save the contract.
+            contractDataManager.saveContract(leaseContract);
+
+            // Remove vehicle.
+            dealership.removeVehicle(LeasedVehicle);
+
+            // Print success message.
+            System.out.println("\nVehicle successfully leased!");
+            break;
+        }
     }
 
     }

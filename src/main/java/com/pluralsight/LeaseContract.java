@@ -4,6 +4,9 @@ public class LeaseContract extends Contract{
     private double expectedEndingValue;
     private double leaseFee;
     private double monthlyPayment;
+    public static final double leaseFeeRate = 0.07;
+    public static final double interestRate = 0.04;
+    public static final int loanTerm = 36;
 
     public LeaseContract(String contractDate, String customerName, String customerEmail, Vehicle vehicleSold, double expectedEndingValue, double leaseFee) {
         super(contractDate, customerName, customerEmail, vehicleSold);

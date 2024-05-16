@@ -5,6 +5,10 @@ public class SalesContract extends Contract{
     private double recordingFee;
     private double processingFee;
     private boolean Financeoption;
+    static final double salesTaxRate = 0.05;
+    static final double recordingFeeRate = 100.0;
+    static final double Under10Kfee = 295.0;
+    static final double Over10Kfee = 495.0;
     double Price=0;
     double monthlyPayment=0;
 
@@ -40,12 +44,12 @@ public class SalesContract extends Contract{
         Financeoption = financeoption;
     }
 
-    public SalesContract(String contractDate, String customerName, String customerEmail, Vehicle vehicleSold , double salesTaxAmount, double recordingFee, double processingFee, boolean isFinanced) {
+    public SalesContract(String contractDate, String customerName, String customerEmail, Vehicle vehicleSold , double salesTaxAmount, double recordingFee, double processingFee) {
         super(contractDate, customerName, customerEmail, vehicleSold);
         this.salesTaxAmount = salesTaxAmount;
         this.recordingFee = recordingFee;
         this.processingFee = processingFee;
-        this.Financeoption = isFinanced;
+
     }
 
 

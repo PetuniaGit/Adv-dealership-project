@@ -32,7 +32,7 @@ public class SalesContract extends Contract{
         this.processingFee = processingFee;
     }
 
-    public boolean isFinancedoption() {
+    public boolean isFinanceoption() {
         return Financeoption;
     }
 

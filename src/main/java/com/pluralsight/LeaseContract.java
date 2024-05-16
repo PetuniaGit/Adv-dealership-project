@@ -36,5 +36,7 @@ public class LeaseContract extends Contract{
     public double getMonthlypayment() {
         return 0.00802*getVehicleSold().getPrice();
     }
+    public boolean isFinanceOption() {
+        return false;
+    }
 }
-git
